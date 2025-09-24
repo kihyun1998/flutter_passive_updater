@@ -77,7 +77,7 @@ flutter_passive_updater/
 - 실패 시 자동 복구
 - 업데이트된 앱 실행
 
-### 2. Flutter 플러그인 (간단한 실행기)
+### 2. Flutter 플러그인 (Go 바이너리 Wrapper)
 
 **새로운 API:**
 ```dart
@@ -134,11 +134,20 @@ await FlutterPassiveUpdater.performUpdate(
 - **Flutter 테스트**: 정상 업데이트 및 실패 복구 시나리오
 - **실패 테스트**: `-force-extract-fail` 플래그로 의도적 압축해제 실패 (배포전 제거)
 
-### 단계 4: Flutter 플러그인 완전 연동
-- Swift에서 Go 바이너리 실행
+### 단계 4: Flutter 플러그인 완전 연동 (Go 바이너리 Wrapper)
+- Swift에서 Resources의 Go 바이너리 찾기
+- 플랫폼별 바이너리 선택 (Intel: updater-darwin-amd64, Apple Silicon: updater-darwin-arm64)
 - 현재 앱 경로 자동 감지
+- Go 바이너리 실행 후 Flutter 앱 종료
 - 에러 처리 및 상태 반환
 - **최종 테스트**: 실제 사용자 시나리오 검증
+
+### Swift 플러그인이 해야할 일
+1. **바이너리 위치 찾기**: Bundle.main.path(forResource: "updater-darwin-arm64", ofType: nil)
+2. **플랫폼 감지**: 현재 Mac이 Intel인지 Apple Silicon인지 확인
+3. **앱 경로 감지**: Bundle.main.bundlePath로 현재 앱 위치 파악
+4. **프로세스 실행**: Process()로 Go 바이너리 실행
+5. **앱 종료**: exit(0)로 Flutter 앱 종료
 
 ### 테스트용 실패 플래그 (배포전 제거)
 - `-force-hash-fail`: 해시 검증 강제 실패
